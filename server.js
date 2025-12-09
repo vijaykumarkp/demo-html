@@ -44,13 +44,27 @@ app.post('/forward', upload.single('input_file'), async (req, res) => {
     // Forward authorization from environment variable if set
     const headers = form.getHeaders();
     const API_KEY = process.env.API_KEY || process.env.TARGET_API_KEY;
-    if (API_KEY) {
-      // Default to Bearer token. If you need a different header format, set FORWARD_AUTH_HEADER env var (e.g. "X-API-Key")
-      const authHeader = process.env.FORWARD_AUTH_HEADER || 'Authorization';
-      const authValue = process.env.FORWARD_AUTH_VALUE || `Bearer ${API_KEY}`;
-      headers[authHeader] = authValue;
-      console.log('Forwarding auth header', authHeader);
+    let authHeaderUsed = null;
+    if (process.env.FORWARD_AUTH_HEADER && process.env.FORWARD_AUTH_VALUE) {
+      headers[process.env.FORWARD_AUTH_HEADER] = process.env.FORWARD_AUTH_VALUE;
+      authHeaderUsed = { name: process.env.FORWARD_AUTH_HEADER, value: process.env.FORWARD_AUTH_VALUE };
+    } else if (API_KEY) {
+      // default behavior: send Authorization: Bearer <API_KEY>
+      headers['Authorization'] = `Bearer ${API_KEY}`;
+      authHeaderUsed = { name: 'Authorization', value: `Bearer ${API_KEY}` };
     }
+
+    // DEBUG: log what we'll forward (mask the value except first/last 4 chars)
+    if (authHeaderUsed && authHeaderUsed.value) {
+      const v = String(authHeaderUsed.value);
+      const masked = v.length > 8 ? v.slice(0,4) + '***' + v.slice(-4) : '***';
+      console.log('>>> Forwarding auth header ->', authHeaderUsed.name, ':', masked);
+    } else {
+      console.log('>>> No auth header configured to forward (API_KEY or FORWARD_AUTH_* not set)');
+    }
+
+    // DEBUG: dump outgoing headers (stringified keys only, no values)
+    console.log('>>> Outgoing headers keys:', Object.keys(headers).join(', '));
 
     const apiResp = await fetch(API_URL, { method: 'POST', body: form, headers });
     const text = await apiResp.text();
