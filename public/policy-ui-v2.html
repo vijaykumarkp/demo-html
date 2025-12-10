@@ -1,27 +1,53 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PIVOT Portability - Enhanced UI (v2)</title>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PIVOT Portability - Enhanced UI</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>body{background:#f6f8fb;font-family:Inter,system-ui,Arial}.card{border-radius:12px;padding:20px}.brand-right img.pivot{height:120px;}</style>
-</head><body>
+<style>
+  body { background:#f6f8fb; font-family:Inter,system-ui,Arial }
+  .card { border-radius:12px; padding:20px; }
+  .brand-right img.pivot { height:150px; }
+  button.active { box-shadow:0 0 0 3px rgba(59,130,246,0.15); }
+  .small-muted { color:#6b7280; }
+  .decision-box { border-radius:8px; padding:12px; background:#fffbeb; border:1px solid #fcd34d; }
+</style>
+</head>
+<body>
 <div class="container py-4">
   <div class="card p-4">
     <div class="d-flex align-items-center justify-content-between mb-3">
-      <div><img src="company_logo.png" alt="Company" style="height:72px"></div>
-      <div style="text-align:center"><div style="font-size:.85rem;color:#6b7280">Product</div><div style="font-weight:700;font-size:1.2rem">PIVOT Portability module</div></div>
-      <div><img src="pivot_logo.png" alt="PIVOT" class="pivot" style="height:120px"></div>
+      <div><img src="company_logo.png" alt="Company" style="height:72px;"></div>
+      <div style="text-align:center">
+        <div style="font-size:.85rem;color:#6b7280">Product</div>
+        <div style="font-weight:700;font-size:1.2rem">PIVOT Portability module</div>
+      </div>
+      <div><img src="pivot_logo.png" alt="PIVOT" class="pivot" style="height:150px;"></div>
     </div>
+
     <hr>
+
     <form id="demoForm" class="row g-2 align-items-end mb-3">
-      <div class="col-md-4"><label class="form-label">Insurance company</label><input id="insurance_company" class="form-control" placeholder="e.g. Star"></div>
-      <div class="col-md-3"><label class="form-label">Data type</label><input id="data_type" class="form-control" placeholder="e.g. port-in"></div>
-      <div class="col-md-3"><label class="form-label">File</label><input id="input_file" type="file" class="form-control"><div id="fileInfo" class="form-text"></div></div>
-      <div class="col-md-2 d-grid">
-        <button id="showClassic" class="btn btn-primary">Show Classic</button>
-        <button id="showEnhanced" class="btn btn-outline-primary mt-1">Show Enhanced Here</button>
+      <div class="col-md-4">
+        <label class="form-label">Insurance company <span class="small text-muted">(optional)</span></label>
+        <input id="insurance_company" class="form-control" placeholder="e.g. Star">
+      </div>
+
+      <div class="col-md-5">
+        <label class="form-label">File</label>
+        <input id="input_file" type="file" class="form-control">
+        <div id="fileInfo" class="form-text"></div>
+      </div>
+
+      <div class="col-md-3 d-grid">
+        <button id="showClassic" class="btn btn-outline-primary mb-1">Show Classic</button>
+        <button id="showEnhanced" class="btn btn-primary">Show Enhanced Here</button>
       </div>
     </form>
+
     <div id="alerts"></div>
+
     <div class="row">
       <div class="col-md-4">
         <div class="text-center">
@@ -29,118 +55,175 @@
           <div id="decideBadge"></div>
           <div class="small-muted mt-2">Underwriter Score</div>
         </div>
-        <div class="mt-3">
-          <button id="exportPdf" class="btn btn-outline-secondary w-100">Export Underwriting Summary (Print/PDF)</button>
-          <a id="downloadJson" class="btn btn-sm btn-outline-secondary w-100 mt-2" download>Download JSON</a>
-        </div>
-      </div>
-      <div class="col-md-8">
-        <h5>Policy summary</h5>
-        <div class="card p-3 mb-3" id="policyCard">
-          <div class="row">
-            <div class="col-md-6"><div><strong>Policy number</strong> <div id="policyNumber" class="small-muted"></div></div><div class="mt-2"><strong>Product</strong> <div id="productName" class="small-muted"></div></div></div>
-            <div class="col-md-6"><div><strong>Policy type</strong> <div id="policyType" class="small-muted"></div></div><div class="mt-2"><strong>Term</strong> <div id="policyTerm" class="small-muted"></div></div></div>
-            <div class="col-12 mt-2"><strong>Period</strong><div id="policyPeriod" class="small-muted"></div></div>
-            <div class="col-12 mt-2"><strong>Sum Insured</strong><div id="sumInsured" class="small-muted"></div></div>
-            <div class="col-12 mt-2"><strong>Company (extracted)</strong><div id="extractedCompany" class="small-muted"></div></div>
+
+        <div class="mt-3 decision-box">
+          <div class="d-flex justify-content-between">
+            <div>
+              <strong id="decisionLabel">REVIEW</strong>
+              <div class="small-muted">Recommended Action</div>
+            </div>
+            <div id="decisionAction" style="font-weight:700">Check continuity & nominee</div>
           </div>
         </div>
 
-        <h6>Proposer</h6>
-        <div class="card p-3 mb-3" id="proposerCard"><div id="proposerName"></div><div class="small-muted" id="proposerContact"></div><div id="proposerAddress"></div></div>
+        <div class="mt-3 controls">
+          <button id="approveBtn" class="btn btn-success w-100">Approve</button>
+          <button id="flagBtn" class="btn btn-warning w-100 mt-2">Flag for manual review</button>
+          <button id="exportPdf" class="btn btn-outline-secondary w-100 mt-2">Export Underwriting Summary (Print/PDF)</button>
+          <a id="downloadJson" class="btn btn-sm btn-outline-secondary w-100 mt-2" download>Download JSON</a>
+        </div>
+      </div>
 
-        <h6>Insured members</h6><div id="insuredList"></div>
-        <h6 class="mt-3">Nominee</h6><div id="nomineeCard" class="card p-3"></div>
+      <div class="col-md-8">
+        <h5>Policy summary</h5>
+        <div class="card p-3 mb-3" id="policyCard">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div style="font-size:.9rem">Product</div>
+              <div id="productName" class="small-muted"></div>
+            </div>
+            <div>
+              <div style="font-size:.9rem">Company</div>
+              <div id="companyTop" class="small-muted"></div>
+            </div>
+          </div>
 
-        <details class="mt-2"><summary class="small-muted">Raw API JSON</summary><pre id="rawJson" class="mt-2 bg-light p-2 rounded" style="max-height:300px;overflow:auto"></pre></details>
+          <hr>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div><strong>Policy number</strong><div id="policyNumber" class="small-muted"></div></div>
+              <div class="mt-2"><strong>Period</strong><div id="policyPeriod" class="small-muted"></div></div>
+            </div>
+            <div class="col-md-6">
+              <div><strong>Policy type</strong><div id="policyType" class="small-muted"></div></div>
+              <div class="mt-2"><strong>Term</strong><div id="policyTerm" class="small-muted"></div></div>
+            </div>
+            <div class="col-12 mt-2"><strong>Sum Insured</strong><div id="sumInsured" class="small-muted"></div></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-7">
+            <h6>Proposer</h6>
+            <div class="card p-3 mb-3" id="proposerCard">
+              <div id="proposerName" class="fw-semibold"></div>
+              <div class="small-muted" id="proposerContact"></div>
+              <div class="mt-2" id="proposerAddress"></div>
+            </div>
+
+            <h6>Insured members</h6>
+            <div id="insuredList"></div>
+
+            <h6 class="mt-3">Nominee</h6>
+            <div id="nomineeCard" class="card p-3"></div>
+          </div>
+
+          <div class="col-md-5">
+            <h6>Risk summary</h6>
+            <div class="card p-3 mb-3"><div id="riskBadges" class="d-flex flex-column gap-2"></div></div>
+
+            <h6>Validation & checks</h6>
+            <div id="checksList" class="checks-list mb-3"></div>
+          </div>
+        </div>
+
+        <details class="mt-2"><summary class="small-muted">Raw API JSON</summary>
+          <pre id="rawJson" class="mt-2 bg-light p-2 rounded" style="max-height:300px; overflow:auto"></pre>
+        </details>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-function el(id){return document.getElementById(id);}
-function parseDate(d){ if(!d) return null; const m=d.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); if(m) return new Date(Number(m[3]),Number(m[2])-1,Number(m[1])); const dt=new Date(d); return isNaN(dt)?null:dt; }
-function formatDate(dt){ if(!dt) return '—'; return dt.toLocaleDateString(); }
-function parseNumber(s){ if(!s) return null; const n=Number(String(s).replace(/[₹,\s]/g,'')); return Number.isFinite(n)?n:null; }
-function validEmail(e){ return !!String(e).match(/^\S+@\S+\.\S+$/); }
-function validPhone(p){ return !!String(p).match(/^\d{10}$/); }
+function setActiveButton(activeId){
+  ['showClassic','showEnhanced'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    if(id===activeId) el.classList.add('active');
+    else el.classList.remove('active');
+  });
+}
 
 function computeScore(data){
-  let score=0;
-  const reqs=[!!data.policy_and_coverage_details?.policy_number, !!data.policy_and_coverage_details?.policy_start_date, !!data.policy_and_coverage_details?.policy_end_date, !!data.proposer_details?.first_name, !!data.proposer_details?.dob, (data.insured_details && data.insured_details.length>0)];
-  const reqScore=Math.round(30*(reqs.filter(Boolean).length/reqs.length)); score+=reqScore;
-  let dateScore=0; const start=parseDate(data.policy_and_coverage_details?.policy_start_date); const end=parseDate(data.policy_and_coverage_details?.policy_end_date);
-  if(start && end){ dateScore+=7; if(end>start) dateScore+=5; const declaredTerm=Number(data.policy_and_coverage_details?.policy_term||0); const years=Math.round((end-start)/(365*24*3600*1000)); if(!isNaN(declaredTerm) && Math.abs(years-declaredTerm)<=1) dateScore+=3; }
-  score+=dateScore;
-  let sumScore=0; const floaterSum=parseNumber(data.policy_and_coverage_details?.floater_basic_sum_insured); const indivSum=parseNumber(data.insured_details?.[0]?.individual_policy_sum_insured); const anySum = floaterSum ?? indivSum; if(anySum!=null){ sumScore+=10; if(!isNaN(anySum)) sumScore+=5; } score+=sumScore;
-  let insScore=0; const ins=data.insured_details?.[0]; if(ins?.insured_name) insScore+=5; if(ins?.dob && ins?.age){ const dDob=parseDate(ins.dob); if(dDob){ const diffYears=Math.floor((new Date()-dDob)/(365*24*3600*1000)); const declaredAge=Number(ins.age); if(!isNaN(declaredAge) && Math.abs(declaredAge-diffYears)<=2) insScore+=5; } } else if(ins?.age) insScore+=2; if(ins?.individual_policy_sum_insured) insScore+=5; score+=insScore;
-  let contactScore=0; const prop=data.proposer_details||{}; if(prop.mobile_number && validPhone(prop.mobile_number)) contactScore+=3; if(prop.email && validEmail(prop.email)) contactScore+=3; if(prop.pan || prop.aadhar) contactScore+=4; score+=contactScore;
-  let nomineeScore=0; if(data.nominee_details && data.nominee_details.length>0){ const totalShare=(data.nominee_details||[]).reduce((s,n)=>s+(Number(n.nominee_share)||0),0); if(totalShare===100) nomineeScore=5; else nomineeScore=2; } score+=nomineeScore;
-  let pedScore=0; const insPed=ins?.declared_ped||''; if(insPed.toLowerCase().includes('no ped')) pedScore=5; else if(!insPed) pedScore=2; score+=pedScore;
-  let sellerScore=0; if(data.seller_details?.seller_name) sellerScore+=3; if(data.issuing_office_details?.office_name) sellerScore+=2; score+=sellerScore;
-  return {score, breakdown:{reqScore,dateScore,sumScore,insScore,contactScore,nomineeScore,pedScore,sellerScore}};
+  try{ if(typeof window.computeScore === 'function') return window.computeScore(data); } catch(e){}
+  return { score: 70, breakdown:{} };
 }
 
 function renderResponse(resp){
   const data = resp?.response?.data || resp || {};
-  const res = computeScore(data);
-  const s = res.score;
-  el('scoreRing').textContent = s + '%';
-  el('scoreRing').style.border = '8px solid ' + (s>=85?'#16a34a':(s>=65?'#f59e0b':'#ef4444'));
-  el('decideBadge').innerHTML = s>=85?'<div style="background:#e6f8ed;color:#08633a;padding:.45rem .7rem;border-radius:.6rem">ACCEPT</div>':(s>=65?'<div style="background:#fff7e6;color:#7a4b00;padding:.45rem .7rem;border-radius:.6rem">REVIEW</div>':'<div style="background:#ffecec;color:#7a1414;padding:.45rem .7rem;border-radius:.6rem">REJECT</div>');
-  document.getElementById('policyNumber').textContent = data.policy_and_coverage_details?.policy_number || '—';
   document.getElementById('productName').textContent = data.policy_and_coverage_details?.policy_product_name || '—';
+  document.getElementById('companyTop').textContent = data.policy_and_coverage_details?.optional_coverage_5 || data.optional_coverage_5 || '—';
+  document.getElementById('policyNumber').textContent = data.policy_and_coverage_details?.policy_number || '—';
+  document.getElementById('policyPeriod').textContent = (data.policy_and_coverage_details?.policy_start_date||'—') + ' → ' + (data.policy_and_coverage_details?.policy_end_date||'—');
   document.getElementById('policyType').textContent = data.policy_and_coverage_details?.policy_type || '—';
   document.getElementById('policyTerm').textContent = data.policy_and_coverage_details?.policy_term || '—';
-  const start=parseDate(data.policy_and_coverage_details?.policy_start_date); const end=parseDate(data.policy_and_coverage_details?.policy_end_date);
-  document.getElementById('policyPeriod').textContent = (start?formatDate(start):data.policy_and_coverage_details?.policy_start_date||'—') + ' → ' + (end?formatDate(end):data.policy_and_coverage_details?.policy_end_date||'—');
-  const sIns = parseNumber(data.policy_and_coverage_details?.floater_basic_sum_insured) ?? parseNumber(data.insured_details?.[0]?.individual_policy_sum_insured);
-  document.getElementById('sumInsured').textContent = sIns!=null ? '₹ ' + sIns.toLocaleString() : '—';
-  try{ document.getElementById('extractedCompany').textContent = data.policy_and_coverage_details?.optional_coverage_5 || data.optional_coverage_5 || '—'; }catch(e){}
-  const p = data.proposer_details||{};
-  document.getElementById('proposerName').textContent = [p.title, p.first_name, p.last_name].filter(Boolean).join(' ') || '—';
-  document.getElementById('proposerContact').textContent = (p.mobile_number? '📞 ' + p.mobile_number+' ' : '') + (p.email? ' ✉️ ' + p.email : '');
-  document.getElementById('proposerAddress').textContent = (p.address? p.address+', ': '') + (p.city? p.city + ', ': '') + (p.state? p.state + ' ': '') + (p.pin_code? p.pin_code: '');
-  const insuredList = document.getElementById('insuredList'); insuredList.innerHTML='';
-  (data.insured_details||[]).forEach(ins=>{ const div=document.createElement('div'); div.className='card p-2 mb-2'; div.innerHTML = `<div class="d-flex justify-content-between"><div><strong>${ins.insured_name||'—'}</strong><div class="small-muted">${ins.relationship||''} • DOB: ${ins.dob||'—'}</div></div><div class="text-end"><div>Age: ${ins.age||'—'}</div><div>SI: ${ins.individual_policy_sum_insured||'—'}</div></div></div><div class="mt-2 small-muted">PED: ${ins.declared_ped||'—'}</div>`; insuredList.appendChild(div); });
-  const nomCard = document.getElementById('nomineeCard'); nomCard.innerHTML=''; (data.nominee_details||[]).forEach(n=>{ const dv=document.createElement('div'); dv.className='mb-1'; dv.innerHTML=`<strong>${n.nominee_name||n.nominee_name||'—'}</strong> <div class="small-muted">${n.nominee_relation||''} • Age: ${n.nominee_age||'—'} • Share: ${n.nominee_share||'—'}%</div>`; nomCard.appendChild(dv); });
-  document.getElementById('rawJson').textContent = JSON.stringify(resp, null, 2);
+  document.getElementById('sumInsured').textContent = data.policy_and_coverage_details?.floater_basic_sum_insured || (data.insured_details && data.insured_details[0]?.individual_policy_sum_insured) || '—';
+
+  const p = data.proposer_details || {};
+  document.getElementById('proposerName').textContent = [p.title,p.first_name,p.last_name].filter(Boolean).join(' ')||'—';
+  document.getElementById('proposerContact').textContent = (p.mobile_number? '📞 ' + p.mobile_number : '') + (p.email? ' ✉ ' + p.email : '');
+  document.getElementById('proposerAddress').textContent = (p.address||'') + ' ' + (p.city||'');
+
+  const insList = document.getElementById('insuredList'); insList.innerHTML='';
+  (data.insured_details||[]).forEach(ins=>{
+    const d=document.createElement('div'); d.className='card p-2 mb-2';
+    d.innerHTML = `<div class="d-flex justify-content-between"><div><strong>${ins.insured_name||'—'}</strong><div class="small-muted">${ins.relationship||'—'} • DOB: ${ins.dob||'—'}</div></div><div class="text-end"><div>First started: ${ins.first_policy_started||'—'}</div><div>Age: ${ins.age||'—'}</div></div></div><div class="mt-2 small-muted">PED: ${ins.declared_ped||'—'}</div>`;
+    insList.appendChild(d);
+  });
+
+  const rb=document.getElementById('riskBadges'); rb.innerHTML='';
+  if(data.insured_details && data.insured_details.length>0){
+    const ins0 = data.insured_details[0];
+    const span=document.createElement('span'); span.className='badge bg-light text-dark'; span.textContent = 'Insured: ' + (ins0.insured_name||'—'); rb.appendChild(span);
+  }
+
+  const checks = document.getElementById('checksList'); checks.innerHTML='';
+  if(!data.policy_and_coverage_details?.policy_number) checks.innerHTML += '<div class="p-2 mb-1 bg-danger text-white">Missing policy number</div>';
+  if(!data.policy_and_coverage_details?.floater_basic_sum_insured && !(data.insured_details && data.insured_details[0]?.individual_policy_sum_insured)) checks.innerHTML += '<div class="p-2 mb-1 bg-warning text-dark">Sum insured is missing</div>';
+
+  const sc = computeScore(data);
+  document.getElementById('scoreRing').textContent = sc.score + '%';
+  document.getElementById('rawJson').textContent = JSON.stringify(resp,null,2);
+
+  if(sc.score >= 85){ document.getElementById('decisionLabel').textContent='ACCEPT'; document.getElementById('decisionAction').textContent='Auto-approve'; }
+  else if(sc.score >= 65){ document.getElementById('decisionLabel').textContent='REVIEW'; document.getElementById('decisionAction').textContent='Manual review suggested'; }
+  else { document.getElementById('decisionLabel').textContent='REJECT / NEEDS DATA'; document.getElementById('decisionAction').textContent='Reject or request missing data'; }
+
+  setActiveButton('showEnhanced');
 }
 
-async function postAndRenderOrNavigate(target){
-  const f = document.getElementById('input_file').files[0];
-  if(!f){ alert('Please choose file'); return; }
-  const fd = new FormData();
-  fd.append('input_file', f);
-  fd.append('insurance_company', document.getElementById('insurance_company').value || '');
-  fd.append('data_type', document.getElementById('data_type').value || '');
-  const btn = target==='here' ? document.getElementById('showClassic') : document.getElementById('showEnhanced');
-  const orig = btn.textContent;
-  btn.disabled=true; btn.textContent='Sending...';
+async function postAndAction(target){
+  const f=document.getElementById('input_file').files[0];
+  const ins=document.getElementById('insurance_company').value || '';
+  if(!f){ alert('Please choose a file'); return; }
+  const fd=new FormData(); fd.append('input_file', f); if(ins) fd.append('insurance_company', ins);
+
+  const btn = (target==='here') ? document.getElementById('showEnhanced') : document.getElementById('showClassic');
+  const orig=btn.textContent; btn.disabled=true; btn.textContent='Sending...';
+
   try{
     const r = await fetch('/forward', { method:'POST', body: fd });
     const text = await r.text();
-    let json=null;
-    try{ json = JSON.parse(text); } catch(e){ json = text; }
+    let json=null; try{ json = JSON.parse(text); } catch(e){ json = text; }
     if(!r.ok){ document.getElementById('alerts').innerHTML = `<div class="alert alert-danger">Error ${r.status}: <pre>${JSON.stringify(json,null,2)}</pre></div>`; return; }
-    if(target==='here'){
-      try{ renderResponse(json); } catch(e){ console.warn(e); }
-    } else {
-      try{ sessionStorage.setItem('lastExtraction', JSON.stringify(json)); } catch(e){}
-      window.location.href = 'policy-ui-v2.html';
-    }
+    if(target==='here'){ renderResponse(json); }
+    else { try{ sessionStorage.setItem('lastExtraction', JSON.stringify(json)); }catch(e){}; window.location.href='policy-ui.html'; }
   }catch(err){
     document.getElementById('alerts').innerHTML = `<div class="alert alert-danger">Network: ${err.message}</div>`;
   }finally{ btn.disabled=false; btn.textContent=orig; }
 }
 
 document.addEventListener('DOMContentLoaded', function(){
-  const c = document.getElementById('showClassic');
-  const e = document.getElementById('showEnhanced');
-  if(c) c.addEventListener('click', function(ev){ ev.preventDefault(); postAndRenderOrNavigate('here'); });
-  if(e) e.addEventListener('click', function(ev){ ev.preventDefault(); postAndRenderOrNavigate('other'); });
-  try{ const raw=sessionStorage.getItem('lastExtraction'); if(raw){ const j=JSON.parse(raw); renderResponse(j); document.getElementById('rawJson').textContent = JSON.stringify(j,null,2); } }catch(e){}
+  document.getElementById('showClassic').addEventListener('click', function(ev){ ev.preventDefault(); postAndAction('other'); });
+  document.getElementById('showEnhanced').addEventListener('click', function(ev){ ev.preventDefault(); postAndAction('here'); });
+
+  try{
+    const raw=sessionStorage.getItem('lastExtraction');
+    if(raw){ const j=JSON.parse(raw); renderResponse(j); }
+  }catch(e){}
 });
 </script>
-</body></html>
+</body>
+</html>
