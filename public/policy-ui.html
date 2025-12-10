@@ -15,32 +15,40 @@
     pre { white-space: pre-wrap; word-break: break-word; }
     .small-muted { font-size:.85rem; color:#6b7280; }
     .logo { max-height:64px; }
-    .product-name { font-weight:700; letter-spacing:.2px; }
+    .logo.pivot { max-height:92px; }             /* bigger pivot logo */
+    .header-center { flex: 1 1 auto; text-align:center; } /* centre text */
+    .product-name { font-weight:700; letter-spacing:.2px; font-size:1.15rem; }
     .check-ok { color:#047857; }
     .check-warn { color:#92400e; }
     .check-bad { color:#b91c1c; }
+    /* responsive tweaks */
+    @media (max-width: 767px) {
+      .logo.pivot { max-height:64px; }
+      .header-center { text-align: left; margin-left: 8px; }
+    }
   </style>
 </head>
 <body>
   <div class="container py-5">
     <div class="card p-4">
+      
       <!-- Header with logos -->
       <div class="d-flex align-items-center justify-content-between mb-3">
         <div class="d-flex align-items-center gap-3">
           <img src="company_logo.png" alt="Company" class="logo" style="height:56px;">
-          <div>
-            <div class="small-muted">Product</div>
-            <div class="product-name">PIVOT Portability module</div>
-            <div class="small-muted">Insurance Automation Suite</div>
-          </div>
         </div>
 
-        <div class="text-end">
-          <img src="pivot_logo.png" alt="PIVOT" class="logo" style="height:64px;">
+        <div class="header-center">
+          <div class="small-muted">Product</div>
+          <div class="product-name">PIVOT Portability module</div>
+          <div class="small-muted">Insurance Automation Suite</div>
+        </div>
+
+        <div>
+          <img src="pivot_logo.png" alt="PIVOT" class="logo pivot">
         </div>
       </div>
-
-      <hr>
+<hr>
 
       <!-- Upload / Form -->
       <form id="demoForm" class="mb-3">
@@ -251,6 +259,9 @@
   // ---------- Render helpers ----------
   function renderScoreUI(resp) {
     const data = resp?.response?.data || resp || {};
+    const insured = data.insured_details?.[0] || null;
+    const ins = insured;
+
     const r = computeScore(data);
     const s = r.score;
     // ring and badge
@@ -315,7 +326,7 @@
     if (!end) checks.push({level:'error', text: 'End date not parseable'});
     if (start && end && end < start) checks.push({level:'error', text: 'End date is before start date'});
     if (sIns == null) checks.push({level:'error', text: 'Sum insured missing'});
-    if ((ins && ins.age && ins.dob)) {
+    if (ins && ins.age && ins.dob) {
       const dob = parseDate(ins.dob);
       if (dob) {
         const calcAge = Math.floor((new Date() - dob) / (365*24*3600*1000));
